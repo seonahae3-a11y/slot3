@@ -8,23 +8,23 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: transparent; /* 🔥 프리즘용 */
+  background: transparent;
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* 🔥 위쪽 정렬 */
-  padding-top: 10px;       /* 👉 위 여백 (조절 가능) */
+  align-items: flex-start;
+  padding-top: 10px;
   height: 100vh;
 }
 
-/* 🔥 전체 크기 축소 */
+/* 전체 크기 */
 .machine {
   position: relative;
   width: 900px;
-  transform: scale(0.65); /* 👉 크기 조절 */
+  transform: scale(0.65);
   transform-origin: top center;
 }
 
-/* 🔥 배경 블러 */
+/* 배경 블러 */
 .bg {
   position: absolute;
   top: 338px;
@@ -94,18 +94,14 @@ html, body {
 
 <div class="machine">
 
-  <!-- 블러 배경 -->
   <div class="bg" id="bg"></div>
 
-  <!-- 슬롯 -->
   <div class="slot">
     <div class="reel" id="reel"></div>
   </div>
 
-  <!-- 프레임 -->
   <img src="frame.png" class="frame">
 
-  <!-- 클릭 영역 -->
   <div class="click-area" onclick="spin()"></div>
 
 </div>
@@ -114,6 +110,7 @@ html, body {
 const total = 68;
 let isSpinning = false;
 let spinAudio;
+let lastSpinTime = 0; // 🔥 쿨타임용
 
 function setup() {
   const reel = document.getElementById("reel");
@@ -128,6 +125,11 @@ function setup() {
 
 function spin() {
   if (isSpinning) return;
+
+  const now = Date.now();
+  if (now - lastSpinTime < 3000) return; // 🔥 3초 쿨타임
+
+  lastSpinTime = now;
   isSpinning = true;
 
   const reel = document.getElementById("reel");
@@ -163,6 +165,13 @@ function spin() {
     isSpinning = false;
   }, 2200);
 }
+
+/* 🔥 핵심: 키 입력으로 실행 */
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "s") {
+    spin();
+  }
+});
 
 setup();
 </script>
