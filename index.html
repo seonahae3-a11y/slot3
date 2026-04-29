@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Slot Machine</title>
+
+<style>
+body {
+  margin: 0;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.machine {
+  position: relative;
+  width: 900px;
+}
+
+/* 🔥 배경 (블러 레이어) */
+.bg {
+  position: absolute;
+  top: 339px;   /* 🔥 slot이랑 동일 */
+  left: 120px;
+  width: 660px;
+  height: 260px;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(25px) brightness(0.5);
+  transform: scale(1.2);
+}
+
+/* 슬롯 */
+.slot {
+  position: absolute;
+  top: 338px;   /* 🔥 bg랑 동일 */
+  left: 120px;
+  width: 660px;
+  height: 260px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* 릴 */
+.reel {
+  position: absolute;
+  width: 100%;
+}
+
+/* 이미지 */
+.reel img {
+  height: 260px;
+  width: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 프레임 */
+.frame {
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* 클릭 */
+.click-area {
+  position: absolute;
+  top: 650px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 80px;
+  cursor: pointer;
+  z-index: 20;
+}
+</style>
+</head>
+
+<body>
+
+<div class="machine">
+
+  <!-- 🔥 블러 배경 -->
+  <div class="bg" id="bg"></div>
+
+  <!-- 슬롯 -->
+  <div class="slot">
+    <div class="reel" id="reel"></div>
+  </div>
+
+  <!-- 프레임 -->
+  <img src="frame.png" class="frame">
+
+  <div class="click-area" onclick="spin()"></div>
+
+</div>
+
+<script>
+const total = 68;
+let isSpinning = false;
+let spinAudio;
+
+function setup() {
+  const reel = document.getElementById("reel");
+
+  for (let i = 1; i <= total; i++) {
+    reel.innerHTML += `<img src="images/${i}.png">`;
+  }
+  for (let i = 1; i <= total; i++) {
+    reel.innerHTML += `<img src="images/${i}.png">`;
+  }
+}
+
+function spin() {
+  if (isSpinning) return;
+  isSpinning = true;
+
+  const reel = document.getElementById("reel");
+  const bg = document.getElementById("bg");
+  const itemHeight = 260;
+
+  // 초기화
+  reel.style.transition = "none";
+  reel.style.transform = "translateY(0)";
+  reel.offsetHeight;
+
+  // 🔊 스핀 사운드
+  spinAudio = new Audio("sounds/spin.mp3");
+  spinAudio.loop = true;
+  spinAudio.volume = 0.4;
+  spinAudio.play().catch(()=>{});
+
+  // 랜덤 선택
+  const target = Math.floor(Math.random() * total);
+  const index = target + 1;
+
+  const moveY = (total + target) * itemHeight;
+
+  reel.style.transition = "transform 2.2s ease-out";
+  reel.style.transform = `translateY(-${moveY}px)`;
+
+  setTimeout(() => {
+    spinAudio.pause();
+
+    // 🔥 블러 배경 변경
+    bg.innerHTML = `<img src="images/${index}.png">`;
+
+    // 🔊 결과 사운드
+    const result = new Audio(`sounds/${index}.mp3`);
+    result.volume = 0.8;
+    result.play().catch(()=>{});
+
+    isSpinning = false;
+  }, 2200);
+}
+
+setup();
+</script>
+
+</body>
+</html>
