@@ -5,24 +5,29 @@
 <title>Slot Machine</title>
 
 <style>
-body {
+html, body {
   margin: 0;
-  background: white;
+  padding: 0;
+  background: transparent; /* 🔥 프리즘용 */
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* 🔥 위쪽 정렬 */
+  padding-top: 10px;       /* 👉 위 여백 (조절 가능) */
   height: 100vh;
 }
 
+/* 🔥 전체 크기 축소 */
 .machine {
   position: relative;
   width: 900px;
+  transform: scale(0.65); /* 👉 크기 조절 */
+  transform-origin: top center;
 }
 
-/* 🔥 배경 (블러 레이어) */
+/* 🔥 배경 블러 */
 .bg {
   position: absolute;
-  top: 339px;   /* 🔥 slot이랑 동일 */
+  top: 338px;
   left: 120px;
   width: 660px;
   height: 260px;
@@ -41,7 +46,7 @@ body {
 /* 슬롯 */
 .slot {
   position: absolute;
-  top: 338px;   /* 🔥 bg랑 동일 */
+  top: 338px;
   left: 120px;
   width: 660px;
   height: 260px;
@@ -71,7 +76,7 @@ body {
   pointer-events: none;
 }
 
-/* 클릭 */
+/* 클릭 영역 */
 .click-area {
   position: absolute;
   top: 650px;
@@ -89,7 +94,7 @@ body {
 
 <div class="machine">
 
-  <!-- 🔥 블러 배경 -->
+  <!-- 블러 배경 -->
   <div class="bg" id="bg"></div>
 
   <!-- 슬롯 -->
@@ -100,6 +105,7 @@ body {
   <!-- 프레임 -->
   <img src="frame.png" class="frame">
 
+  <!-- 클릭 영역 -->
   <div class="click-area" onclick="spin()"></div>
 
 </div>
@@ -128,18 +134,15 @@ function spin() {
   const bg = document.getElementById("bg");
   const itemHeight = 260;
 
-  // 초기화
   reel.style.transition = "none";
   reel.style.transform = "translateY(0)";
   reel.offsetHeight;
 
-  // 🔊 스핀 사운드
   spinAudio = new Audio("sounds/spin.mp3");
   spinAudio.loop = true;
   spinAudio.volume = 0.4;
   spinAudio.play().catch(()=>{});
 
-  // 랜덤 선택
   const target = Math.floor(Math.random() * total);
   const index = target + 1;
 
@@ -151,10 +154,8 @@ function spin() {
   setTimeout(() => {
     spinAudio.pause();
 
-    // 🔥 블러 배경 변경
     bg.innerHTML = `<img src="images/${index}.png">`;
 
-    // 🔊 결과 사운드
     const result = new Audio(`sounds/${index}.mp3`);
     result.volume = 0.8;
     result.play().catch(()=>{});
