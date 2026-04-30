@@ -23,15 +23,10 @@ html, body {
   transform-origin: top center;
 }
 
-/* 클릭 막는 요소 통과 */
-.machine * {
-  pointer-events: none;
-}
-
 .bg {
   position: absolute;
-  top: 360px;
-  left: 130px;
+  top: 338px;
+  left: 120px;
   width: 660px;
   height: 260px;
   z-index: 0;
@@ -48,8 +43,8 @@ html, body {
 
 .slot {
   position: absolute;
-  top: 360px;
-  left: 130px;
+  top: 338px;
+  left: 120px;
   width: 660px;
   height: 260px;
   overflow: hidden;
@@ -72,13 +67,25 @@ html, body {
   position: absolute;
   width: 100%;
   z-index: 10;
+  pointer-events: none;
+}
+
+.click-area {
+  position: absolute;
+  top: 650px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 80px;
+  cursor: pointer;
+  z-index: 20;
 }
 </style>
 </head>
 
 <body>
 
-<div class="machine" id="machine">
+<div class="machine">
 
   <div class="bg" id="bg"></div>
 
@@ -88,15 +95,16 @@ html, body {
 
   <img src="frame.png" class="frame">
 
+  <div class="click-area" onclick="spin()"></div>
+
 </div>
 
 <script>
 const total = 68;
 let isSpinning = false;
 let spinAudio;
-let lastSpinTime = 0;
 
-/* 🔥 WebSocket 연결 */
+/* 🔥 여기 추가 (핵심) */
 const socket = new WebSocket("ws://localhost:3000");
 
 socket.onmessage = (event) => {
@@ -118,11 +126,6 @@ function setup() {
 
 function spin() {
   if (isSpinning) return;
-
-  const now = Date.now();
-  if (now - lastSpinTime < 3000) return;
-
-  lastSpinTime = now;
   isSpinning = true;
 
   const reel = document.getElementById("reel");
@@ -158,11 +161,6 @@ function spin() {
     isSpinning = false;
   }, 2200);
 }
-
-/* 클릭으로도 실행 */
-document.getElementById("machine").addEventListener("click", () => {
-  spin();
-});
 
 setup();
 </script>
