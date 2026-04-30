@@ -76,7 +76,7 @@ html, body {
   pointer-events: none;
 }
 
-/* 클릭 영역 */
+/* 클릭 영역 (굳이 없어도 됨, 유지용) */
 .click-area {
   position: absolute;
   top: 650px;
@@ -102,7 +102,7 @@ html, body {
 
   <img src="frame.png" class="frame">
 
-  <div class="click-area" onclick="spin()"></div>
+  <div class="click-area"></div>
 
 </div>
 
@@ -110,7 +110,7 @@ html, body {
 const total = 68;
 let isSpinning = false;
 let spinAudio;
-let lastSpinTime = 0; // 🔥 쿨타임용
+let lastSpinTime = 0;
 
 function setup() {
   const reel = document.getElementById("reel");
@@ -127,7 +127,7 @@ function spin() {
   if (isSpinning) return;
 
   const now = Date.now();
-  if (now - lastSpinTime < 3000) return; // 🔥 3초 쿨타임
+  if (now - lastSpinTime < 3000) return; // 쿨타임
 
   lastSpinTime = now;
   isSpinning = true;
@@ -166,9 +166,9 @@ function spin() {
   }, 2200);
 }
 
-/* 🔥 핵심: 키 입력으로 실행 */
-document.addEventListener("keydown", (e) => {
-  if (e.key.toLowerCase() === "s") {
+/* 🔥 핵심: 화면 아무데나 클릭하면 실행 */
+document.body.addEventListener("click", () => {
+  if (!isSpinning) {
     spin();
   }
 });
