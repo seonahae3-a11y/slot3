@@ -16,7 +16,6 @@ html, body {
   height: 100vh;
 }
 
-/* 전체 크기 */
 .machine {
   position: relative;
   width: 900px;
@@ -24,11 +23,15 @@ html, body {
   transform-origin: top center;
 }
 
-/* 배경 블러 */
+/* 클릭 막는 요소 통과 */
+.machine * {
+  pointer-events: none;
+}
+
 .bg {
   position: absolute;
-  top: 338px;
-  left: 120px;
+  top: 360px;
+  left: 130px;
   width: 660px;
   height: 260px;
   z-index: 0;
@@ -43,24 +46,21 @@ html, body {
   transform: scale(1.2);
 }
 
-/* 슬롯 */
 .slot {
   position: absolute;
-  top: 338px;
-  left: 120px;
+  top: 360px;
+  left: 130px;
   width: 660px;
   height: 260px;
   overflow: hidden;
   z-index: 1;
 }
 
-/* 릴 */
 .reel {
   position: absolute;
   width: 100%;
 }
 
-/* 이미지 */
 .reel img {
   height: 260px;
   width: auto;
@@ -68,31 +68,17 @@ html, body {
   margin: 0 auto;
 }
 
-/* 프레임 */
 .frame {
   position: absolute;
   width: 100%;
   z-index: 10;
-  pointer-events: none;
-}
-
-/* 클릭 영역 (굳이 없어도 됨, 유지용) */
-.click-area {
-  position: absolute;
-  top: 650px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 80px;
-  cursor: pointer;
-  z-index: 20;
 }
 </style>
 </head>
 
 <body>
 
-<div class="machine">
+<div class="machine" id="machine">
 
   <div class="bg" id="bg"></div>
 
@@ -102,8 +88,6 @@ html, body {
 
   <img src="frame.png" class="frame">
 
-  <div class="click-area"></div>
-
 </div>
 
 <script>
@@ -111,6 +95,15 @@ const total = 68;
 let isSpinning = false;
 let spinAudio;
 let lastSpinTime = 0;
+
+/* 🔥 WebSocket 연결 */
+const socket = new WebSocket("ws://localhost:3000");
+
+socket.onmessage = (event) => {
+  if (event.data === "spin") {
+    spin();
+  }
+};
 
 function setup() {
   const reel = document.getElementById("reel");
@@ -127,7 +120,7 @@ function spin() {
   if (isSpinning) return;
 
   const now = Date.now();
-  if (now - lastSpinTime < 3000) return; // 쿨타임
+  if (now - lastSpinTime < 3000) return;
 
   lastSpinTime = now;
   isSpinning = true;
@@ -166,11 +159,9 @@ function spin() {
   }, 2200);
 }
 
-/* 🔥 핵심: 화면 아무데나 클릭하면 실행 */
-document.body.addEventListener("click", () => {
-  if (!isSpinning) {
-    spin();
-  }
+/* 클릭으로도 실행 */
+document.getElementById("machine").addEventListener("click", () => {
+  spin();
 });
 
 setup();
