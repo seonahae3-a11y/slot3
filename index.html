@@ -16,16 +16,14 @@ html, body {
   height: 100vh;
 }
 
-/* 🔥 전체 컨테이너 */
 .machine {
   position: relative;
   width: 900px;
   transform: scale(0.65);
   transform-origin: top center;
-  overflow: hidden; /* 🔥 핵심 (삐져나옴 방지) */
+  overflow: hidden;
 }
 
-/* 🔥 배경 */
 .bg {
   position: absolute;
   top: 338px;
@@ -43,25 +41,22 @@ html, body {
   filter: blur(25px) brightness(0.5);
 }
 
-/* 슬롯 */
 .slot {
   position: absolute;
   top: 338px;
   left: 120px;
   width: 660px;
   height: 260px;
-  overflow: hidden; /* 🔥 반드시 필요 */
+  overflow: hidden;
   z-index: 1;
 }
 
-/* 릴 */
 .reel {
   position: absolute;
   width: 100%;
   left: 0;
 }
 
-/* 이미지 */
 .reel img {
   width: 100%;
   height: 260px;
@@ -69,7 +64,6 @@ html, body {
   display: block;
 }
 
-/* 프레임 */
 .frame {
   position: absolute;
   width: 100%;
@@ -77,7 +71,6 @@ html, body {
   pointer-events: none;
 }
 
-/* 클릭 영역 */
 .click-area {
   position: absolute;
   top: 650px;
@@ -112,14 +105,21 @@ const total = 68;
 let isSpinning = false;
 let spinAudio;
 
-/* 🔥 WebSocket 연결 */
-const socket = new WebSocket("ws://localhost:3000");
+/* 🔥 웹소켓 (안전 버전) */
+let socket;
 
-socket.onmessage = (event) => {
-  if (event.data === "spin") {
-    spin();
-  }
-};
+try {
+  socket = new WebSocket("ws://localhost:3000");
+
+  socket.onmessage = (event) => {
+    if (event.data === "spin") {
+      spin();
+    }
+  };
+
+} catch (e) {
+  console.log("웹소켓 연결 안됨 (정상)");
+}
 
 function setup() {
   const reel = document.getElementById("reel");
