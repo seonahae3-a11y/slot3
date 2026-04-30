@@ -21,7 +21,6 @@ html, body {
   width: 900px;
   transform: scale(0.65);
   transform-origin: top center;
-  overflow: hidden;
 }
 
 .bg {
@@ -39,6 +38,7 @@ html, body {
   height: 100%;
   object-fit: cover;
   filter: blur(25px) brightness(0.5);
+  transform: scale(1.2);
 }
 
 .slot {
@@ -54,14 +54,13 @@ html, body {
 .reel {
   position: absolute;
   width: 100%;
-  left: 0;
 }
 
 .reel img {
-  width: 100%;
   height: 260px;
-  object-fit: cover;
+  width: auto;
   display: block;
+  margin: 0 auto;
 }
 
 .frame {
@@ -104,21 +103,17 @@ html, body {
 const total = 68;
 let isSpinning = false;
 let spinAudio;
+let lastSpinTime = 0;
 
-/* 🔥 웹소켓 (안전 버전) */
-let socket;
-
-try {
-  socket = new WebSocket("ws://localhost:3000");
+/* 🔥 추가된 부분 (Node 연결) */
+if (location.hostname === "localhost") {
+  const socket = new WebSocket("ws://localhost:3000");
 
   socket.onmessage = (event) => {
     if (event.data === "spin") {
       spin();
     }
   };
-
-} catch (e) {
-  console.log("웹소켓 연결 안됨 (정상)");
 }
 
 function setup() {
@@ -134,6 +129,11 @@ function setup() {
 
 function spin() {
   if (isSpinning) return;
+
+  const now = Date.now();
+  if (now - lastSpinTime < 3000) return;
+
+  lastSpinTime = now;
   isSpinning = true;
 
   const reel = document.getElementById("reel");
@@ -150,7 +150,7 @@ function spin() {
   spinAudio.play().catch(()=>{});
 
   const target = Math.floor(Math.random() * total);
-  const index = target;
+  const index = target + 1;
 
   const moveY = (total + target) * itemHeight;
 
@@ -160,15 +160,22 @@ function spin() {
   setTimeout(() => {
     spinAudio.pause();
 
-    bg.innerHTML = `<img src="images/${index + 1}.png">`;
+    bg.innerHTML = `<img src="images/${index}.png">`;
 
-    const result = new Audio(`sounds/${index + 1}.mp3`);
+    const result = new Audio(`sounds/${index}.mp3`);
     result.volume = 0.8;
     result.play().catch(()=>{});
 
     isSpinning = false;
   }, 2200);
 }
+
+/* 키 입력 */
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "s") {
+    spin();
+  }
+});
 
 setup();
 </script>
